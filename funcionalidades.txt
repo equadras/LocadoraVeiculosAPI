@@ -1,0 +1,23 @@
+funcionario
+- cadastrar funcionario ✅ 
+- mudar salario funcionario✅
+- mudar cargo funcionario✅
+- demitir funcionario✅
+- alterar endereço funcionario✅
+
+
+veiculos
+ - adicionar veiculo✅
+ - deletar veiculo✅
+
+cliente
+ - cadastrar cliente✅
+ - alterar endereço✅
+
+reservar carro:
+    valor = tempo_final - tempo_inicio * (0,05 val_carro)
+
+
+reset.py
+    - limpa os dados das reservas atuais
+    - limpa os dados dos carros reservados atualmente
