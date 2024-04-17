@@ -51,3 +51,22 @@ def cadastrar_funcionario():
         return "Cliente cadastrado com sucesso!"
     else:
         return "Erro ao cadastrar o cliente."
+
+def promover_funcionario():
+    cpf = input("CPF: ")
+    novo_cargo = input("Novo cargo: ")
+    novo_salario = input("Novo salario: ")
+
+    # Criar o dicionário com os dados do cliente
+    cliente_data = {
+        "cargo": novo_cargo,
+        "salario": novo_salario
+    }
+
+    response = requests.put(local_host + "/promover_funcionario/" + cpf, json=cliente_data)
+    
+    # Verificar o status da resposta
+    if response.status_code == 200:
+        return "funcionario promovido com sucesso!"
+    else:
+        return "Erro ao promover o funcionario."

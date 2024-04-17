@@ -45,13 +45,18 @@ def promover_funcionario(id_func):
     data = request.json
     novo_cargo = data.get('cargo')
     novo_salario = data.get('salario')
-    query = """UPDATE funcionarios 
-               SET cargo = '{novo_cargo}', salario = {novo_salario}
-               WHERE id_funcionario = {id_func}"""
-    
+
+    query = text("""UPDATE funcionarios
+                    SET cargo = :novo_cargo, salario = :novo_salario
+                    WHERE id_funcionario = :id_func""")
+
     # Atualizar o cargo e o salário do funcionário na tabela 'funcionario'
     with engine.connect() as connection:
-        connection.execute(query)
+        connection.execute(query, {
+            'novo_cargo': novo_cargo,
+            'novo_salario': novo_salario,
+            'id_func': id_func
+        })
 
     return f"Dados do funcionário com ID {id_func} atualizados com sucesso!"
 
