@@ -78,13 +78,15 @@ def alterar_endereco_funcionario(id_func):
 
 @app.route("/demitir_funcionario/<int:id_func>", methods=["DELETE"])
 def demitir_funcionario(id_func):
+
+    query = text("UPDATE funcionarios SET ativo = :ativo WHERE id_funcionario = :id_func")
+
     with engine.connect() as connection:
-        connection.execute(
-            f"UPDATE funcionarios SET ativo = False WHERE id_funcionario = {id_func}"
-        )
+        connection.execute(query, {'ativo': False, 'id_func': id_func})
+
 
     return f"Funcionário com ID {id_func} foi demitido com sucesso!"
-# =========================================================== 
+
 
 # =================== ROTAS VEICULOS =================== 
 @app.route("/get_all_veiculos", methods=["GET"])
