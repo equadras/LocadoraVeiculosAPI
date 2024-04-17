@@ -45,13 +45,18 @@ def promover_funcionario(id_func):
     data = request.json
     novo_cargo = data.get('cargo')
     novo_salario = data.get('salario')
-    query = """UPDATE funcionarios 
-               SET cargo = '{novo_cargo}', salario = {novo_salario}
-               WHERE id_funcionario = {id_func}"""
-    
+
+    query = text("""UPDATE funcionarios
+                    SET cargo = :novo_cargo, salario = :novo_salario
+                    WHERE id_funcionario = :id_func""")
+
     # Atualizar o cargo e o salário do funcionário na tabela 'funcionario'
     with engine.connect() as connection:
-        connection.execute(query)
+        connection.execute(query, {
+            'novo_cargo': novo_cargo,
+            'novo_salario': novo_salario,
+            'id_func': id_func
+        })
 
     return f"Dados do funcionário com ID {id_func} atualizados com sucesso!"
 
@@ -62,11 +67,12 @@ def alterar_endereco_funcionario(id_func):
     data = request.json
     novo_endereco = data.get('endereco')
     
+     # Use parameterized query to prevent SQL injection
+    query = text("UPDATE funcionarios SET endereco = :endereco WHERE id_funcionario = :id_func")
+
     # Atualizar o endereço do funcionário na tabela 'funcionarios'
     with engine.connect() as connection:
-        connection.execute(
-            f"UPDATE funcionarios SET endereco = '{novo_endereco}' WHERE id_funcionario = {id_func}"
-        )
+        connection.execute(query, {'endereco': novo_endereco, 'id_func': id_func})
 
     return f"Endereço do funcionário com ID {id_func} alterado com sucesso!"
 
@@ -109,14 +115,23 @@ def adicionar_veiculo():
     vlr_car = data.get('vlr_car')
     ar_cond = data.get('ar_cond')
     ativo = data.get('ativo', True) 
-    query = f"""INSERT INTO veiculos (placa, tipo_comb, cor, marca, modelo, kms, vlr_car, ar_cond, ativo) VALUES
-            ('{placa}', '{tipo_comb}', '{cor}', '{marca}', '{modelo}', {kms},
-            {vlr_car}, {ar_cond}, {ativo})"""
+    query = text("""INSERT INTO veiculos (placa, tipo_comb, cor, marca, modelo, kms, vlr_car, ar_cond, ativo) VALUES
+            (:placa, :tipo_comb, :cor, :marca, :modelo, :kms, :vlr_car, :ar_cond, :ativo)""")
     
     with engine.connect() as connection:
-        connection.execute(query)
+        connection.execute(query, {
+                'placa': placa,
+                'tipo_comb': tipo_comb,
+                'cor': cor,
+                'marca': marca,
+                'modelo': modelo, 
+                'kms': kms,
+                'vlr_car': vlr_car,
+                'ar_cond': ar_cond,
+                'ativo': ativo
+            })
 
-    return "Veículo adicionado com sucesso!"
+    return jsonify({"message": "Veículo adicionado com sucesso!"})
 # =========================================================== 
 
 # =================== ROTAS CLIENTES =================== 
@@ -134,17 +149,16 @@ def alterar_endereco_cliente(id_cliente):
     data = request.json
     novo_endereco = data.get('endereco')
 
-    query = text("UPDATE clientes SET endereco = :novo_endereco WHERE
-    id_cliente = :id_cliente")
+    query = text("""UPDATE clientes SET endereco = :novo_endereco WHERE
+    id_cliente = :id_cliente""")
     
     with engine.connect() as connection:
         connection.execute(query, {
                 'id_cliente': id_cliente, 
                 'novo_endereco': novo_endereco
             })
-        )
 
-    return jsonify({"Endereço do cliente com ID {id_cliente} alterado com sucesso!"})
+    return jsonify({"message": "Endereço do cliente com ID {id_cliente} alterado com sucesso!"})
 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
