@@ -3,6 +3,15 @@ import requests
 
 local_host = "http://127.0.0.1:8080"
 
+def tirar_veiculo_frota():
+    placa = input("Qual a placa do veiculo: ")
+    response = requests.delete(local_host + f"/tirar_veiculo_frota/{placa}")
+
+    if response.status_code == 200:
+        return "Veiculo retirado com sucesso!"
+    else:
+        return "Erro ao retirar o veiculo"
+
 def adicionar_veiculo():
     placa = input("Placa do veículo: ")
     tipo_comb = input("Tipo combustivel: ")
@@ -28,7 +37,6 @@ def adicionar_veiculo():
 
     response = requests.post(local_host + "/adicionar_veiculo", json=novo_veiculo)
     
-    # Verificar o status da resposta
     if response.status_code == 200:
         return "Veículo cadastrado com sucesso!"
     else:

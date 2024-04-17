@@ -98,8 +98,11 @@ def get_all_veiculos():
 
 @app.route("/tirar_veiculo_frota/<string:placa>", methods=["DELETE"])
 def tirar_veiculo_frota(placa):
+    query = text("UPDATE veiculos SET ativo = False WHERE placa = :placa")
     with engine.connect() as connection:
-        connection.execute(f"UPDATE veiculos SET ativo = False WHERE placa = {placa}")
+        connection.execute(query, {
+            "placa": placa
+            })
 
     return f"Veículo com placa {placa} foi retirado da frota com sucesso!"
 
