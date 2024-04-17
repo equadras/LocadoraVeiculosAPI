@@ -35,6 +35,7 @@ def cadastrar_funcionario():
             'salario': salario,
             'dt_nasc': dt_nasc
         })
+        connection.commit()
 
     return "Funcionário cadastrado com sucesso!"
 
@@ -57,6 +58,7 @@ def promover_funcionario(id_func):
             'novo_salario': novo_salario,
             'id_func': id_func
         })
+        connection.commit()
 
     return f"Dados do funcionário com ID {id_func} atualizados com sucesso!"
 
@@ -72,7 +74,9 @@ def alterar_endereco_funcionario(id_func):
 
     # Atualizar o endereço do funcionário na tabela 'funcionarios'
     with engine.connect() as connection:
-        connection.execute(query, {'endereco': novo_endereco, 'id_func': id_func})
+        connection.execute(query, {'endereco': novo_endereco, 
+                                    'id_func': id_func})
+        connection.commit()
 
     return f"Endereço do funcionário com ID {id_func} alterado com sucesso!"
 
@@ -83,7 +87,7 @@ def demitir_funcionario(id_func):
 
     with engine.connect() as connection:
         connection.execute(query, {'ativo': False, 'id_func': id_func})
-
+        connection.commit()
 
     return f"Funcionário com ID {id_func} foi demitido com sucesso!"
 
@@ -91,11 +95,28 @@ def demitir_funcionario(id_func):
 # =================== ROTAS VEICULOS =================== 
 @app.route("/get_all_veiculos", methods=["GET"])
 def get_all_veiculos():
+    query = text("SELECT placa, tipo_comb,cor,marca,modelo,kms,vlr_car, ar_cond, ativo FROM veiculos")
+
     with engine.connect() as connection:
-        result = connection.execute("SELECT placa, marca, modelo, ar_cond, vlr_car FROM veiculos WHERE ativo = true")
-        veiculos = result.fetchall()
-    
-    return jsonify(veiculos)
+        result = connection.execute(query)
+        clientes = []
+        for row in result.fetchall():
+            # Convert each row to a dictionary manually
+            cliente = {
+                    "placa": row[0],
+                    "tipo_comb": row[1],
+                    "cor": row[2],
+                    "marca": row[3],
+                    "modelo": row[4],
+                    "kms": row[5],
+                    "vlr_car": row[6],
+                    "ar_cond": row[7],
+                    "ativo": row[8]
+                    # Add more fields as needed
+                    }
+            clientes.append(cliente)
+
+    return jsonify(clientes)
 
 
 @app.route("/tirar_veiculo_frota/<string:placa>", methods=["DELETE"])
@@ -105,7 +126,8 @@ def tirar_veiculo_frota(placa):
         connection.execute(query, {
             "placa": placa
             })
-
+        connection.commit()
+        
     return f"Veículo com placa {placa} foi retirado da frota com sucesso!"
 
 @app.route("/adicionar_veiculo", methods=["POST"])
@@ -135,6 +157,7 @@ def adicionar_veiculo():
                 'ar_cond': ar_cond,
                 'ativo': ativo
             })
+        connection.commit()
 
     return jsonify({"message": "Veículo adicionado com sucesso!"})
 # =========================================================== 
@@ -143,11 +166,24 @@ def adicionar_veiculo():
 
 @app.route("/get_all_clientes", methods=["GET"])
 def get_all_clientes():
-    query = text("SELECT * FROM clientes")
+    query = text("SELECT cod_cliente, nome, cpf, dt_nasc, endereco, cnh FROM clientes")
     with engine.connect() as connection:
         result = connection.execute(query)
+        clientes = []
+        for row in result.fetchall():
+            # Convert each row to a dictionary manually
+            cliente = {
+                    "cod_cliente": row[0],
+                    "nome": row[1],
+                    "cpf": row[2],
+                    "dt_nasc": row[3],
+                    "endereco": row[4],
+                    "cnh": row[5],
+                    # Add more fields as needed
+                    }
+            clientes.append(cliente)
 
-
+    return jsonify(clientes)
 
 @app.route("/alterar_endereco_cliente/<int:id_cliente>", methods=["PUT"])
 def alterar_endereco_cliente(id_cliente):
@@ -162,6 +198,7 @@ def alterar_endereco_cliente(id_cliente):
                 'id_cliente': id_cliente, 
                 'novo_endereco': novo_endereco
             })
+        connection.commit()
 
     return jsonify({"message": "Endereço do cliente com ID {id_cliente} alterado com sucesso!"})
 
@@ -185,7 +222,7 @@ def cadastrar_cliente():
             'cpf': cpf,
             'endereco': endereco
         })
-
+        connection.commit()
     return jsonify({"message": "Cliente cadastrado com sucesso!"})
 # =========================================== 
 

@@ -43,10 +43,48 @@ def adicionar_veiculo():
         return "Erro ao cadastrar o veículo."
 
 
+def listar_veiculos():
+    response = requests.get(local_host + "/get_all_veiculos");
+
+    if response.status_code == 200:
+        veiculos = response.json()
+        for veiculo in veiculos:
+            if (veiculo["ativo"] == False):
+                continue
+            else:
+                print("Marca:", veiculo["marca"])
+                print("Modelo:", veiculo["modelo"])
+                print("Valor:", veiculo["vlr_car"])
+                print("Tipo de combustivel:", veiculo["tipo_comb"])
+                print("Ar condicionado:", veiculo["ar_cond"])
+                print("Placa:", veiculo["placa"])
+                print() 
+    else:
+        return "Erro ao listar clientes"
+
+def listar_clientes():
+    response = requests.get(local_host + "/get_all_clientes");
+
+    if response.status_code == 200:
+        clientes = response.json()
+        for cliente in clientes:
+            print("Nome:", cliente["nome"])
+            print("CPF:", cliente["cpf"])
+            print("Data de Nascimento:", cliente["dt_nasc"])
+            print("Endereço:", cliente["endereco"])
+            print("CNH:", cliente["cnh"])
+            print() 
+    else:
+        return "Erro ao listar clientes"
+
+
+
 def mudar_endereco_cliente():
     # mostrar todos os clientes
     novo_endereco = input("Novo endereço: ")
     id_cliente = int(input("Seu ID: "))
+
+
 
 def cadastrar_cliente():
     nome = input("Nome: ")
