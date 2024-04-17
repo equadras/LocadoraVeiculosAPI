@@ -12,6 +12,10 @@ $ pip install -r requirements.txt
 Após instalar as depencias é necessário matar qualquer processo que esteja presente na porta 8080 do seu computador para poder rodar o servidor localmente
 ```bash
 $ sudo lsof -i :8080
+```
+Caso após rodar o ```lsof -i :8080``` não listar nenhuma porta, signifca que nenhum processo está ocupando essa porta. 
+Pegar o numero do processo e executar o comando abaixo com o número do processo. 
+```bash
 $ sudo kill 998244353
 ```
 ou caso esteja em um ambiente windows
