@@ -132,3 +132,16 @@ def alterar_endereco_funcionario():
         return "endereco do funcionario alterado com sucesso!"
     else:
         return "Erro ao alterar o endereco do funcionario."
+
+
+
+def demitir_funcionario():
+    cpf = input("CPF do funcionario: ")
+
+    response = requests.delete(local_host + "/demitir_funcionario/" + cpf);
+
+    if response.status_code == 200:
+        return "Funcionario demitidio com sucesso"
+    else:
+        return "Erro ao demitir funcionario."
+

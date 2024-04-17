@@ -6,7 +6,7 @@ sair = True
 
 
 while (sair):
-    menu_inicial = Menu("Cadastrar Usuario", "Cadastrar Funcionario", "Promover Funcionario", "Alterar Endereco de Funcionario", "todo", "Adicionar Veículo", "Tirar Veículo Frota")
+    menu_inicial = Menu("Cadastrar Usuario", "Cadastrar Funcionario", "Promover Funcionario", "Alterar Endereco de Funcionario", "Demitir Funcionario", "Adicionar Veículo")
     menu_inicial.interface()
     escolha = menu_inicial.input()
     
@@ -21,8 +21,8 @@ while (sair):
         case 3:
             print(alterar_endereco_funcionario())
         case 4:
-            print("todo")
+            print(demitir_funcionario())
         case 5:
             print(adicionar_veiculo())
-        case 6:
+        case 7:
             print(tirar_veiculo_frota())
