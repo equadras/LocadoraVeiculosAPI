@@ -59,7 +59,7 @@ VALUES
     ('GHI91011', 'Diesel', 'Branco', 'Ford', 'Ranger', 60000, 50000.00, true, true),
     ('JKL3456', 'Flex', 'Vermelho', 'Volkswagen', 'Gol', 40000, 28000.00, true, true),
     ('MNO6789', 'Gasolina', 'Branco', 'Chevrolet', 'Prisma', 35000, 25000.00, false, true),
-    ('PQR9012', 'Diesel', 'Cinza', 'Ford', 'Fiesta', 45000, 30000.00, true);
+    ('PQR9012', 'Diesel', 'Cinza', 'Ford', 'Fiesta', 45000, 30000.00, true, true);
 
 -- Inserir dados na tabela de funcionários
 INSERT INTO funcionarios (nome, cpf, cargo, endereco, salario, dt_nasc, ativo) 

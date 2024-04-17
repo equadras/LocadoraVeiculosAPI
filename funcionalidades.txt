@@ -1,6 +1,5 @@
 funcionario
 - cadastrar funcionario ✅ 
-- mudar salario funcionario✅
 - mudar cargo funcionario✅
 - demitir funcionario✅
 - alterar endereço funcionario✅
