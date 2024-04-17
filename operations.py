@@ -3,6 +3,13 @@ import requests
 
 local_host = "http://127.0.0.1:8080"
 
+def mudar_endereco_cliente():
+    # mostrar todos os clientes
+    novo_endereco = input("Novo endereço: ")
+    id_cliente = int(input("Seu ID: "))
+
+
+
 def cadastrar_cliente():
     nome = input("Nome: ")
     cpf = input("CPF: ")

@@ -119,21 +119,33 @@ def adicionar_veiculo():
     return "Veículo adicionado com sucesso!"
 # =========================================================== 
 
+# =================== ROTAS CLIENTES =================== 
 
-# =================== ROTAS VEICULOS =================== 
+@app.route("/get_all_clientes", methods=["GET"])
+def get_all_clientes():
+    query = text("SELECT * FROM clientes")
+    with engine.connect() as connection:
+        result = connection.execute(query)
+
+
+
 @app.route("/alterar_endereco_cliente/<int:id_cliente>", methods=["PUT"])
 def alterar_endereco_cliente(id_cliente):
     data = request.json
     novo_endereco = data.get('endereco')
+
+    query = text("UPDATE clientes SET endereco = :novo_endereco WHERE
+    id_cliente = :id_cliente")
     
     with engine.connect() as connection:
-        connection.execute(
-            f"UPDATE funcionarios SET endereco = '{novo_endereco}' WHERE id_cliente = {id_cliente}"
+        connection.execute(query, {
+                'id_cliente': id_cliente, 
+                'novo_endereco': novo_endereco
+            })
         )
 
-    return f"Endereço do cliente com ID {id_func} alterado com sucesso!"
+    return jsonify({"Endereço do cliente com ID {id_cliente} alterado com sucesso!"})
 
-# =================== ROTAS CLIENTES =================== 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
     data = request.json
