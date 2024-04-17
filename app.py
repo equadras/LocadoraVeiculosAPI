@@ -67,11 +67,12 @@ def alterar_endereco_funcionario(id_func):
     data = request.json
     novo_endereco = data.get('endereco')
     
+     # Use parameterized query to prevent SQL injection
+    query = text("UPDATE funcionarios SET endereco = :endereco WHERE id_funcionario = :id_func")
+
     # Atualizar o endereço do funcionário na tabela 'funcionarios'
     with engine.connect() as connection:
-        connection.execute(
-            f"UPDATE funcionarios SET endereco = '{novo_endereco}' WHERE id_funcionario = {id_func}"
-        )
+        connection.execute(query, {'endereco': novo_endereco, 'id_func': id_func})
 
     return f"Endereço do funcionário com ID {id_func} alterado com sucesso!"
 

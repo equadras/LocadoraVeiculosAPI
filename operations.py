@@ -53,7 +53,7 @@ def cadastrar_funcionario():
         return "Erro ao cadastrar o cliente."
 
 def promover_funcionario():
-    cpf = input("CPF: ")
+    cpf = input("CPF do funcionario: ")
     novo_cargo = input("Novo cargo: ")
     novo_salario = input("Novo salario: ")
 
@@ -70,3 +70,20 @@ def promover_funcionario():
         return "funcionario promovido com sucesso!"
     else:
         return "Erro ao promover o funcionario."
+
+def alterar_endereco_funcionario():
+    cpf = input("CPF do funcionario: ")
+    novo_endereco = input("Novo endereco: ")
+
+    # Criar o dicionário com os dados do cliente
+    cliente_data = {
+        "endereco": novo_endereco
+    }
+
+    response = requests.put(local_host + "/alterar_endereco_funcionario/" + cpf, json=cliente_data)
+    
+    # Verificar o status da resposta
+    if response.status_code == 200:
+        return "endereco do funcionario alterado com sucesso!"
+    else:
+        return "Erro ao alterar o endereco do funcionario."
