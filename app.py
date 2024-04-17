@@ -1,4 +1,5 @@
 import sys
+import json
 from flask import Flask, request, jsonify
 from psutil import process_iter
 from signal import SIGTERM
@@ -122,7 +123,7 @@ def alterar_endereco_cliente(id_cliente):
 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
-    data = request.json
+    data = json.loads(request.json)
     dt_nasc = data.get('dt_nasc')
     cnh = data.get('cnh')
     nome = data.get('nome')
