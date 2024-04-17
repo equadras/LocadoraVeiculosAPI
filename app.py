@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from psutil import process_iter
 from signal import SIGTERM
 from sqlalchemy import create_engine
+from sqlalchemy import text
 
 app = Flask(__name__)
 engine = create_engine("postgresql://trab_banco_owner:5kYVI6gRfHlK@ep-nameless-tooth-a5fq2x2q-pooler.us-east-2.aws.neon.tech/trab_banco?sslmode=require")
@@ -19,14 +20,24 @@ def cadastrar_funcionario():
     endereco = data.get('endereco')
     salario = data.get('salario')
     dt_nasc = data.get('dt_nasc')
-    query = f"""INSERT INTO funcionarios (nome, cpf, cargo, endereco, salario, dt_nasc, ativo) 
-                VALUES ('{nome}', '{cpf}', '{cargo}', '{endereco}', {salario}, '{dt_nasc}', true)"""
+
+    # Utilize parâmetros na consulta SQL para evitar injeção de SQL
+    query = text("INSERT INTO funcionarios (nome, cpf, cargo, endereco, salario, dt_nasc, ativo) "
+                 "VALUES (:nome, :cpf, :cargo, :endereco, :salario, :dt_nasc, true)")
 
     # Inserir os dados do funcionário na tabela 'funcionario'
     with engine.connect() as connection:
-        connection.execute(query)
+        connection.execute(query, {
+            'nome': nome,
+            'cpf': cpf,
+            'cargo': cargo,
+            'endereco': endereco,
+            'salario': salario,
+            'dt_nasc': dt_nasc
+        })
 
     return "Funcionário cadastrado com sucesso!"
+
 
 @app.route("/promover_funcionario/<int:id_func>", methods=["PUT"])
 def promover_funcionario(id_func):
@@ -43,6 +54,7 @@ def promover_funcionario(id_func):
         connection.execute(query)
 
     return f"Dados do funcionário com ID {id_func} atualizados com sucesso!"
+
 
 @app.route("/alterar_endereco_funcionario/<int:id_func>", methods=["PUT"])
 def alterar_endereco_funcionario(id_func):
@@ -121,19 +133,27 @@ def alterar_endereco_cliente(id_cliente):
 
     return f"Endereço do cliente com ID {id_func} alterado com sucesso!"
 
+# =================== ROTAS CLIENTES =================== 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
-    data = json.loads(request.json)
+    data = request.json
     dt_nasc = data.get('dt_nasc')
     cnh = data.get('cnh')
     nome = data.get('nome')
     cpf = data.get('cpf')
     endereco = data.get('endereco')
-    query = f"""INSERT INTO clientes (dt_nasc, cnh, nome, cpf, endereco) 
-                VALUES ('{dt_nasc}', '{cnh}', '{nome}', '{cpf}', '{endereco}')"""
-    
+
+    query = text("INSERT INTO clientes (dt_nasc, cnh, nome, cpf, endereco) "
+                 "VALUES (:dt_nasc, :cnh, :nome, :cpf, :endereco)")
+
     with engine.connect() as connection:
-        connection.execute(query)
+        connection.execute(query,{
+            'dt_nasc': dt_nasc,
+            'cnh': cnh,
+            'nome': nome,
+            'cpf': cpf,
+            'endereco': endereco
+        })
 
     return jsonify({"message": "Cliente cadastrado com sucesso!"})
 # =========================================== 
