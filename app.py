@@ -3,8 +3,8 @@ import json
 from flask import Flask, request, jsonify
 from psutil import process_iter
 from signal import SIGTERM
-from sqlalchemy import create_engine
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 engine = create_engine("postgresql://trab_banco_owner:5kYVI6gRfHlK@ep-nameless-tooth-a5fq2x2q-pooler.us-east-2.aws.neon.tech/trab_banco?sslmode=require")
@@ -238,7 +238,97 @@ def cadastrar_cliente():
         connection.commit()
     return jsonify({"message": "Cliente cadastrado com sucesso!"})
 # =========================================== 
+@app.route("/fazer_reserva", methods=["POST"])
+def fazer_reserva():
+    # Recebendo os dados da requisição
+    data = request.json
+    cpf = data.get("cpf")
 
+    cod_cliente = 0
+
+    # Obtendo o código do cliente a partir do CPF
+    query_cod_cliente = text("SELECT cod_cliente FROM clientes WHERE cpf = :cpf")
+    with engine.connect() as connection:
+        result = connection.execute(query_cod_cliente, {"cpf": cpf})
+        row = result.fetchone()
+        if row:
+            cod_cliente = row[0]
+        else:
+            return "Cliente não encontrado", 404
+
+    cpf_funcionario = data.get("cpf_funcionario")
+
+    # Obtendo o ID do funcionário a partir do CPF
+    query_id_funcionario = text("SELECT id_funcionario FROM funcionarios WHERE cpf = :cpf_funcionario")
+    with engine.connect() as connection:
+        result = connection.execute(query_id_funcionario, {"cpf_funcionario": cpf_funcionario})
+        row = result.fetchone()
+        if row:
+            id_funcionario = row[0]
+        else:
+            return "Funcionário não encontrado", 404
+
+    dias = int(data.get("dias"))
+    dt_reserva = data.get("dt_reserva")
+
+    # Calcular a data de devolução
+    dt_reserva_obj = datetime.fromisoformat(dt_reserva)
+    dt_devolucao_obj = dt_reserva_obj + timedelta(days=dias)
+    dt_devolucao = dt_devolucao_obj.isoformat()
+
+    placa = data.get("placa")
+    query_valor_carro = text("SELECT vlr_car FROM veiculos WHERE placa = :placa")
+    with engine.connect() as connection:
+        result = connection.execute(query_valor_carro, {"placa": placa})
+        row = result.fetchone()
+        if row:
+            vlr_carro = row[0]
+        else:
+            return "Carro não encontrado", 404
+
+    # Calcular o valor da reserva
+    valor = calcular_valor_reserva(vlr_carro, dias)
+
+    # Gravar na tabela reservas
+    query_reservas = text("INSERT INTO reservas (cod_cliente, id_funcionario, valor, dt_reserva, dt_devolucao) VALUES (:cod_cliente, :id_funcionario, :valor, :dt_reserva, :dt_devolucao)")
+    with engine.connect() as connection:
+        connection.execute(query_reservas, {
+            "cod_cliente": cod_cliente,
+            "id_funcionario": id_funcionario,
+            "valor": valor,
+            "dt_reserva": dt_reserva,
+            "dt_devolucao": dt_devolucao
+        })
+        connection.commit()
+    print("Reserva realizada com sucesso!")
+    return jsonify(valor)
+
+
+@app.route("/get_all_reservas", methods=["GET"])
+def get_all_reservas():
+    query = text("SELECT cod_reserva, cod_cliente, id_funcionario, valor, dt_reserva, dt_devolucao FROM reservas")
+    with engine.connect() as connection:
+        result = connection.execute(query)
+        reservas = []
+        for row in result.fetchall():
+            reserva = {
+                "cod_reserva": row[0],
+                "cod_cliente": row[1],
+                "id_funcionario": row[2],
+                "valor": row[3],
+                "dt_reserva": row[4],
+                "dt_devolucao": row[5]
+                # Add more fields as needed
+            }
+            reservas.append(reserva)
+
+    return jsonify(reservas)
+
+def calcular_valor_reserva(vlr_carro, dias):
+    vlr = float(vlr_carro)
+    temp = int(dias)
+    valor_por_dia = (0.001 * vlr) + 10
+    return valor_por_dia * temp
 
 
 @app.route("/")

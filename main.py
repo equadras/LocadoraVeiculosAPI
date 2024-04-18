@@ -23,10 +23,11 @@ while (sair):
             #veículos 
             "Adicionar veículo",
             "Listar veículos",
-            "Tirar Veículo frota"
+            "Tirar Veículo frota",
+
+            "Reservar veiculo",
+            "Ver reservas feitas"
             )
-            # alugar veiculo
-            # ver veiuclos disponiveis
 
     menu_inicial.interface()
     escolha = menu_inicial.input()
@@ -58,4 +59,8 @@ while (sair):
             print(get_all_veiculos())
         case 11:
             print(tirar_veiculo_frota())
+        case 12:
+            print(fazer_reserva())
+        case 13:
+            print(get_all_reservas())
 

@@ -202,4 +202,50 @@ def demitir_funcionario():
     else:
         return "Erro ao demitir funcionario."
 
+def get_all_reservas():
+    response = requests.get(local_host + "/get_all_reservas")
+
+    if response.status_code == 200:
+        reservas = response.json()
+        for reserva in reservas:
+            print("Código da reserva:", reserva["cod_reserva"])
+            print("Código do cliente:", reserva["cod_cliente"])
+            print("ID do funcionário:", reserva["id_funcionario"])
+            print("Valor:", reserva["valor"])
+            print("Data da reserva:", reserva["dt_reserva"])
+            print("Data de devolução:", reserva["dt_devolucao"])
+            print("#####################################")
+    else:
+        return "Erro ao listar reservas"
+
+
+def fazer_reserva():
+    get_all_veiculos()
+    placa = input("Placa do carro:")
+
+    get_all_clientes()
+    cpf = input("CPF do cliente:")
+
+    get_all_funcionarios()
+    id_funcionario = input("CPF do funcionario:")
+
+    dt_reserva = input("Data inicio da reserva:")
+    dias = input("Quantidade de dias:")
+
+    cliente_data = { 
+            "cpf": cpf,
+            "cpf_funcionario": id_funcionario,
+            "dias": dias,
+            "dt_reserva": dt_reserva,
+            "placa": placa
+            }
+
+    response = requests.post(local_host + "/fazer_reserva", json=cliente_data)
+
+    if response.status_code == 200:
+        valor = response.json()  # Extracting the value from the JSON response
+        print("Valor da reserva:", valor)
+        return "Reserva realizada com sucesso!"
+    else:
+        return "Erro ao realizar a reserva."
 
