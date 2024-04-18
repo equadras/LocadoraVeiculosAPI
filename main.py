@@ -23,7 +23,8 @@ while (sair):
             "Adicionar veículo",
             "Listar veículos",
             "Tirar Veículo frota",
-
+            
+            #reservas
             "Reservar veiculo",
             "Ver reservas feitas"
             )
