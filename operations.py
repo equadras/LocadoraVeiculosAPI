@@ -43,7 +43,7 @@ def adicionar_veiculo():
         return "Erro ao cadastrar o veículo."
 
 
-def listar_veiculos():
+def get_all_veiculos():
     response = requests.get(local_host + "/get_all_veiculos");
 
     if response.status_code == 200:
@@ -62,6 +62,21 @@ def listar_veiculos():
     else:
         return "Erro ao listar clientes"
 
+def get_all_funcionarios():
+    response = requests.get(local_host + "/get_all_funcionarios")
+
+    if response.status_code == 200:
+        funcionarios = response.json()
+        for funcionario in funcionarios:
+            print("########################")
+            print("Nome: ", funcionario["nome"])
+            print("CPF: ", funcionario["cpf"])
+            print("Cargo: ", funcionario["cargo"])
+            print("Salario: ", funcionario["salario"])
+        else:
+            return "Erro ao listar funcionarios"
+
+
 def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes");
 
@@ -78,7 +93,7 @@ def get_all_clientes():
         return "Erro ao listar clientes"
 
 def alterar_endereco_cliente():
-    cpf = str(input("CPF: "))
+    cpf = str(input("CPF cliente: "))
     novo_endereco = input("Novo endereço: ")
 
     cliente_data = {"endereco": novo_endereco }
@@ -163,12 +178,9 @@ def alterar_endereco_funcionario():
     novo_endereco = input("Novo endereco: ")
 
     # Criar o dicionário com os dados do cliente
-    cliente_data = {
-        "endereco": novo_endereco
-    }
+    cliente_data = { "endereco": novo_endereco }
 
     response = requests.put(local_host + "/alterar_endereco_funcionario/" + cpf, json=cliente_data)
-    # Verificar o status da resposta
     if response.status_code == 200:
         return "endereco do funcionario alterado com sucesso!"
     else:
@@ -183,4 +195,5 @@ def demitir_funcionario():
         return "Funcionario demitidio com sucesso"
     else:
         return "Erro ao demitir funcionario."
+
 

@@ -10,6 +10,26 @@ app = Flask(__name__)
 engine = create_engine("postgresql://trab_banco_owner:5kYVI6gRfHlK@ep-nameless-tooth-a5fq2x2q-pooler.us-east-2.aws.neon.tech/trab_banco?sslmode=require")
 
 # =================== ROTAS FUNCIONARIOS  =================== 
+@app.route("/get_all_funcionarios", methods=["GET"])
+def get_all_funcionarios():
+    query = text("SELECT nome, cpf, cargo, salario FROM funcionarios WHERE ativo = true")
+
+    with engine.connect() as connection:
+        result = connection.execute(query)
+        funcs = []
+        print(resut.jso)
+        for row in result.fetchall():
+            # Convert each row to a dictionary manually
+            func = {
+                    "nome": row[0],
+                    "cpf": row[1],
+                    "cargo": row[2],
+                    "salario": row[3],
+                    }
+            funcs.append(func)
+
+    return jsonify(funcs)
+
 @app.route("/cadastrar_funcionario", methods=["POST"])
 def cadastrar_funcionario():
     # Obter os dados do funcionário a partir do corpo da requisição
@@ -63,30 +83,29 @@ def promover_funcionario(cpf):
     return f"Dados do funcionário com CPF {cpf} atualizados com sucesso!"
 
 
-@app.route("/alterar_endereco_funcionario/<int:cpf>", methods=["PUT"])
+@app.route("/alterar_endereco_funcionario/<string:cpf>", methods=["PUT"])
 def alterar_endereco_funcionario(cpf):
     data = request.json
     novo_endereco = data.get('endereco')
     
-    query = text("UPDATE funcionarios SET endereco = :novo_endereco WHERE cpf = ':cpf'")
+    query = text("UPDATE funcionarios SET endereco = :novo_endereco WHERE cpf = :cpf")
 
     # Atualizar o endereço do funcionário na tabela 'funcionarios'
     with engine.connect() as connection:
-        connection.execute(query, {'endereco': novo_endereco, 'cpf': cpf})
+        connection.execute(query, {'novo_endereco': novo_endereco, 'cpf': cpf})
         connection.commit()
 
     return f"Endereço do funcionário com CPF {cpf} alterado com sucesso!"
 
-@app.route("/demitir_funcionario/<int:id_func>", methods=["DELETE"])
-def demitir_funcionario(id_func):
-
-    query = text("UPDATE funcionarios SET ativo = :ativo WHERE id_funcionario = :id_func")
+@app.route("/demitir_funcionario/<string:cpf>", methods=["DELETE"])
+def demitir_funcionario(cpf):
+    query = text("UPDATE funcionarios SET ativo = false WHERE cpf = :cpf")
 
     with engine.connect() as connection:
-        connection.execute(query, {'ativo': False, 'id_func': id_func})
+        connection.execute(query, {'cpf': cpf})
         connection.commit()
 
-    return f"Funcionário com ID {id_func} foi demitido com sucesso!"
+    return f"Funcionário com cpf {cpf} foi demitido com sucesso!"
 
 
 # =================== ROTAS VEICULOS =================== 
