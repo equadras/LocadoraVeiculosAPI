@@ -223,7 +223,7 @@ def fazer_reserva():
     get_all_funcionarios()
     id_funcionario = input("CPF do funcionario:")
 
-    dt_reserva = input("Data inicio da reserva:")
+    dt_reserva = input("Data inicio da reserva (no formato YYYY-MM-DD): ")
     dias = input("Quantidade de dias:")
 
     cliente_data = { 
