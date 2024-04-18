@@ -76,9 +76,6 @@ def get_all_funcionarios():
                 print("Nome: ", funcionario["nome"])
                 print("CPF: ", funcionario["cpf"])
                 print("Cargo: ", funcionario["cargo"])
-                print("Salario: ", funcionario["salario"])
-                print("Endereco: ", funcionario["endereco"])
-                print("Data de nascimento: ", funcionario["dt_nasc"])
     else:
         print ("Erro ao listar funcionarios")
 
@@ -91,9 +88,6 @@ def get_all_clientes():
         for cliente in clientes:
             print("Nome:", cliente["nome"])
             print("CPF:", cliente["cpf"])
-            print("Data de Nascimento:", cliente["dt_nasc"])
-            print("Endereço:", cliente["endereco"])
-            print("CNH:", cliente["cnh"])
             print("#####################################") 
     else:
         return "Erro ao listar clientes"

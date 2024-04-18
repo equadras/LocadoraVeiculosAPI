@@ -1,7 +1,6 @@
 from menu import *
 from operations import *
 
-a = Menu("Cadstrar Usuário", "asdfsdf")
 sair = True
 
 while (sair):
