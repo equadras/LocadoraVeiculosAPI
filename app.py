@@ -12,7 +12,7 @@ engine = create_engine("postgresql://trab_banco_owner:5kYVI6gRfHlK@ep-nameless-t
 # =================== ROTAS FUNCIONARIOS  =================== 
 @app.route("/get_all_funcionarios", methods=["GET"])
 def get_all_funcionarios():
-    query = text("SELECT nome, cpf, cargo, salario, endereco, dt_nasc FROM funcionarios")
+    query = text("SELECT nome, cpf, cargo, salario, endereco, dt_nasc, ativo FROM funcionarios")
     with engine.connect() as connection:
         result = connection.execute(query)
         funcionarios = []
@@ -24,7 +24,8 @@ def get_all_funcionarios():
                     "cargo": row[2],
                     "salario": row[3],
                     "endereco": row[4],
-                    "dt_nasc": row[5]
+                    "dt_nasc": row[5],
+                    "ativo": row[6]
                     # Add more fields as needed
                     }
             funcionarios.append(funcionario)

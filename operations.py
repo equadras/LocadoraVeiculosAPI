@@ -49,16 +49,16 @@ def get_all_veiculos():
     if response.status_code == 200:
         veiculos = response.json()
         for veiculo in veiculos:
-            if (veiculo["ativo"] == False):
-                continue
-            else:
-                print("Marca:", veiculo["marca"])
-                print("Modelo:", veiculo["modelo"])
-                print("Valor:", veiculo["vlr_car"])
-                print("Tipo de combustivel:", veiculo["tipo_comb"])
-                print("Ar condicionado:", veiculo["ar_cond"])
-                print("Placa:", veiculo["placa"])
-                print("#####################################") 
+            # if (veiculo["ativo"] == False):
+            #     continue
+            # else:
+            print("Marca:", veiculo["marca"])
+            print("Modelo:", veiculo["modelo"])
+            print("Valor:", veiculo["vlr_car"])
+            print("Tipo de combustivel:", veiculo["tipo_comb"])
+            print("Ar condicionado:", veiculo["ar_cond"])
+            print("Placa:", veiculo["placa"])
+            print("#####################################") 
     else:
         return "Erro ao listar clientes"
 
@@ -68,16 +68,19 @@ def get_all_funcionarios():
     if response.status_code == 200:
         funcionarios = response.json()
         for funcionario in funcionarios:
-            print("########################")
-            print("Nome: ", funcionario["nome"])
-            print("CPF: ", funcionario["cpf"])
-            print("Cargo: ", funcionario["cargo"])
-            print("Salario: ", funcionario["salario"])
-            print("Endereco: ", funcionario["endereco"])
-            print("Data de nascimento: ", funcionario["dt_nasc"])
 
-        else:
-            return "Erro ao listar funcionarios"
+            if (funcionario["ativo"] == False):
+                continue
+            else:
+                print("########################")
+                print("Nome: ", funcionario["nome"])
+                print("CPF: ", funcionario["cpf"])
+                print("Cargo: ", funcionario["cargo"])
+                print("Salario: ", funcionario["salario"])
+                print("Endereco: ", funcionario["endereco"])
+                print("Data de nascimento: ", funcionario["dt_nasc"])
+    else:
+        print ("Erro ao listar funcionarios")
 
 
 def get_all_clientes():
@@ -195,7 +198,7 @@ def demitir_funcionario():
     response = requests.delete(local_host + "/demitir_funcionario/" + cpf);
 
     if response.status_code == 200:
-        return "Funcionario demitidio com sucesso"
+        return "Funcionario demitido com sucesso"
     else:
         return "Erro ao demitir funcionario."
 
