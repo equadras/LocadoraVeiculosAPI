@@ -8,19 +8,19 @@ while (sair):
     menu_inicial = Menu(
             #sair
             "Sair",
-            #clientes typa shit
+            #clientes
             "Adicionar cliente",
             "Listar clientes",
             "Alterar endereço de cliente",
 
-            #funcionarios typa shit
+            #funcionarios 
             "Adicionar funcionario",
             "Listar funcionarios",
             "Alterar endereço de funcionario",
             "Demitir funcionario",
             "Promover funcionario", 
 
-            #veículos typa shit
+            #veículos 
             "Adicionar veículo",
             "Listar veículos",
             "Tirar Veículo frota"
@@ -33,6 +33,7 @@ while (sair):
     
     match escolha:
         case 0:
+            print("Saindo do aplicativo")
             sair = False;
         case 1:
             print(cadastrar_cliente())
@@ -54,7 +55,7 @@ while (sair):
         case 9:
             print(adicionar_veiculo())
         case 10:
-            print(listar_veiculos())
+            print(get_all_veiculos())
         case 11:
             print(tirar_veiculo_frota())
 

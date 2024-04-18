@@ -73,6 +73,9 @@ def get_all_funcionarios():
             print("CPF: ", funcionario["cpf"])
             print("Cargo: ", funcionario["cargo"])
             print("Salario: ", funcionario["salario"])
+            print("Endereco: ", funcionario["endereco"])
+            print("Data de nascimento: ", funcionario["dt_nasc"])
+
         else:
             return "Erro ao listar funcionarios"
 

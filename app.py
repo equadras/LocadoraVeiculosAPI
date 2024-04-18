@@ -12,23 +12,24 @@ engine = create_engine("postgresql://trab_banco_owner:5kYVI6gRfHlK@ep-nameless-t
 # =================== ROTAS FUNCIONARIOS  =================== 
 @app.route("/get_all_funcionarios", methods=["GET"])
 def get_all_funcionarios():
-    query = text("SELECT nome, cpf, cargo, salario FROM funcionarios WHERE ativo = true")
-
+    query = text("SELECT nome, cpf, cargo, salario, endereco, dt_nasc FROM funcionarios")
     with engine.connect() as connection:
         result = connection.execute(query)
-        funcs = []
-        print(resut.jso)
+        funcionarios = []
         for row in result.fetchall():
             # Convert each row to a dictionary manually
-            func = {
+            funcionario = {
                     "nome": row[0],
                     "cpf": row[1],
                     "cargo": row[2],
                     "salario": row[3],
+                    "endereco": row[4],
+                    "dt_nasc": row[5]
+                    # Add more fields as needed
                     }
-            funcs.append(func)
+            funcionarios.append(funcionario)
 
-    return jsonify(funcs)
+    return jsonify(funcionarios)
 
 @app.route("/cadastrar_funcionario", methods=["POST"])
 def cadastrar_funcionario():
