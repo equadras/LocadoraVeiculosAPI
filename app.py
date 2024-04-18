@@ -240,6 +240,7 @@ def cadastrar_cliente():
 # =========================================== 
 
 
+
 @app.route("/")
 def hello_world():
     return "Hello, World!"

@@ -49,16 +49,16 @@ def get_all_veiculos():
     if response.status_code == 200:
         veiculos = response.json()
         for veiculo in veiculos:
-            # if (veiculo["ativo"] == False):
-            #     continue
-            # else:
-            print("Marca:", veiculo["marca"])
-            print("Modelo:", veiculo["modelo"])
-            print("Valor:", veiculo["vlr_car"])
-            print("Tipo de combustivel:", veiculo["tipo_comb"])
-            print("Ar condicionado:", veiculo["ar_cond"])
-            print("Placa:", veiculo["placa"])
-            print("#####################################") 
+            if (veiculo["ativo"] == False):
+                continue
+            else:
+                print("Marca:", veiculo["marca"])
+                print("Modelo:", veiculo["modelo"])
+                print("Valor:", veiculo["vlr_car"])
+                print("Tipo de combustivel:", veiculo["tipo_comb"])
+                print("Ar condicionado:", veiculo["ar_cond"])
+                print("Placa:", veiculo["placa"])
+                print("#####################################") 
     else:
         return "Erro ao listar clientes"
 
