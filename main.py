@@ -6,24 +6,29 @@ sair = True
 
 
 while (sair):
-    menu_inicial = Menu("Cadastrar cliente", "listar clientes", 
-            "Mudar endereco de cliente",  "Cadastrar funcionario",
-            "Promover funcionario", "alterar endereco de funcionario",
-            "Demitir funcionario", "adicionar veiculo", 
-            "Listar veiculos", "tirar veiculo da frota")
+    menu_inicial = Menu(
+            "Cadastrar cliente", 
+            "listar clientes", 
+            "Mudar endereco de cliente",  
+            "Cadastrar funcionario",
+            "Promover funcionario", 
+            "alterar endereco de funcionario",
+            "Demitir funcionario", 
+            "adicionar veiculo", 
+            "Listar veiculos", 
+            "tirar veiculo da frota")
 
     menu_inicial.interface()
     escolha = menu_inicial.input()
     
-
     match escolha:
-
         case 0:
             print(cadastrar_cliente())
         case 1:
-            listar_clientes()
+            get_all_clientes()
         case 2:
-            print(mudar_endereco_cliente())
+            get_all_clientes()
+            print(alterar_endereco_cliente())
         case 3:
             print(cadastrar_funcionario())
         case 4:

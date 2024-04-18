@@ -58,11 +58,11 @@ def listar_veiculos():
                 print("Tipo de combustivel:", veiculo["tipo_comb"])
                 print("Ar condicionado:", veiculo["ar_cond"])
                 print("Placa:", veiculo["placa"])
-                print() 
+                print("#####################################") 
     else:
         return "Erro ao listar clientes"
 
-def listar_clientes():
+def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes");
 
     if response.status_code == 200:
@@ -73,17 +73,21 @@ def listar_clientes():
             print("Data de Nascimento:", cliente["dt_nasc"])
             print("Endereço:", cliente["endereco"])
             print("CNH:", cliente["cnh"])
-            print() 
+            print("#####################################") 
     else:
         return "Erro ao listar clientes"
 
-
-
-def mudar_endereco_cliente():
-    # mostrar todos os clientes
+def alterar_endereco_cliente():
+    cpf = str(input("CPF: "))
     novo_endereco = input("Novo endereço: ")
-    id_cliente = int(input("Seu ID: "))
 
+    cliente_data = {"endereco": novo_endereco }
+    
+    response = requests.put(local_host + f"/alterar_endereco_cliente/{cpf}", json=cliente_data)
+    if response.status_code == 200:
+        return "Endereco do cliente alterado com sucesso!";
+    else:
+        return "Erro ao alterar o enredeço do cliente"
 
 
 def cadastrar_cliente():
@@ -127,13 +131,13 @@ def cadastrar_funcionario():
         "salario": salario
     }
 
-    response = requests.post(local_host + "/cadastrar_cliente", json=cliente_data)
+    response = requests.post(local_host + "/cadastrar_funcionario", json=cliente_data)
     
     # Verificar o status da resposta
     if response.status_code == 200:
-        return "Cliente cadastrado com sucesso!"
+        return "Funcionário cadastrado com sucesso!"
     else:
-        return "Erro ao cadastrar o cliente."
+        return "Erro ao cadastrar o funcionario."
 
 def promover_funcionario():
     cpf = input("CPF do funcionario: ")
@@ -141,12 +145,12 @@ def promover_funcionario():
     novo_salario = input("Novo salario: ")
 
     # Criar o dicionário com os dados do cliente
-    cliente_data = {
+    func_data = {
         "cargo": novo_cargo,
         "salario": novo_salario
     }
 
-    response = requests.put(local_host + "/promover_funcionario/" + cpf, json=cliente_data)
+    response = requests.put(local_host + f"/promover_funcionario/{cpf}", json=func_data)
     
     # Verificar o status da resposta
     if response.status_code == 200:
@@ -164,14 +168,11 @@ def alterar_endereco_funcionario():
     }
 
     response = requests.put(local_host + "/alterar_endereco_funcionario/" + cpf, json=cliente_data)
-    
     # Verificar o status da resposta
     if response.status_code == 200:
         return "endereco do funcionario alterado com sucesso!"
     else:
         return "Erro ao alterar o endereco do funcionario."
-
-
 
 def demitir_funcionario():
     cpf = input("CPF do funcionario: ")

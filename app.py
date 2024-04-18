@@ -37,11 +37,11 @@ def cadastrar_funcionario():
         })
         connection.commit()
 
-    return "Funcionário cadastrado com sucesso!"
+    return jsonify({"message": "Funcionário cadastrado com sucesso!"})
 
 
-@app.route("/promover_funcionario/<int:id_func>", methods=["PUT"])
-def promover_funcionario(id_func):
+@app.route("/promover_funcionario/<string:cpf>", methods=["PUT"])
+def promover_funcionario(cpf):
     # Obter os novos dados do funcionário a partir do corpo da requisição
     data = request.json
     novo_cargo = data.get('cargo')
@@ -49,36 +49,33 @@ def promover_funcionario(id_func):
 
     query = text("""UPDATE funcionarios
                     SET cargo = :novo_cargo, salario = :novo_salario
-                    WHERE id_funcionario = :id_func""")
+                    WHERE cpf = :cpf""")
 
     # Atualizar o cargo e o salário do funcionário na tabela 'funcionario'
     with engine.connect() as connection:
         connection.execute(query, {
             'novo_cargo': novo_cargo,
             'novo_salario': novo_salario,
-            'id_func': id_func
+            'cpf': cpf
         })
         connection.commit()
 
-    return f"Dados do funcionário com ID {id_func} atualizados com sucesso!"
+    return f"Dados do funcionário com CPF {cpf} atualizados com sucesso!"
 
 
-@app.route("/alterar_endereco_funcionario/<int:id_func>", methods=["PUT"])
-def alterar_endereco_funcionario(id_func):
-    # Obter o novo endereço do funcionário a partir do corpo da requisição
+@app.route("/alterar_endereco_funcionario/<int:cpf>", methods=["PUT"])
+def alterar_endereco_funcionario(cpf):
     data = request.json
     novo_endereco = data.get('endereco')
     
-     # Use parameterized query to prevent SQL injection
-    query = text("UPDATE funcionarios SET endereco = :endereco WHERE id_funcionario = :id_func")
+    query = text("UPDATE funcionarios SET endereco = :novo_endereco WHERE cpf = ':cpf'")
 
     # Atualizar o endereço do funcionário na tabela 'funcionarios'
     with engine.connect() as connection:
-        connection.execute(query, {'endereco': novo_endereco, 
-                                    'id_func': id_func})
+        connection.execute(query, {'endereco': novo_endereco, 'cpf': cpf})
         connection.commit()
 
-    return f"Endereço do funcionário com ID {id_func} alterado com sucesso!"
+    return f"Endereço do funcionário com CPF {cpf} alterado com sucesso!"
 
 @app.route("/demitir_funcionario/<int:id_func>", methods=["DELETE"])
 def demitir_funcionario(id_func):
@@ -163,7 +160,6 @@ def adicionar_veiculo():
 # =========================================================== 
 
 # =================== ROTAS CLIENTES =================== 
-
 @app.route("/get_all_clientes", methods=["GET"])
 def get_all_clientes():
     query = text("SELECT cod_cliente, nome, cpf, dt_nasc, endereco, cnh FROM clientes")
@@ -185,22 +181,18 @@ def get_all_clientes():
 
     return jsonify(clientes)
 
-@app.route("/alterar_endereco_cliente/<int:id_cliente>", methods=["PUT"])
-def alterar_endereco_cliente(id_cliente):
+@app.route("/alterar_endereco_cliente/<string:cpf>", methods=["PUT"])
+def alterar_endereco_cliente(cpf):
     data = request.json
     novo_endereco = data.get('endereco')
 
-    query = text("""UPDATE clientes SET endereco = :novo_endereco WHERE
-    id_cliente = :id_cliente""")
-    
+    query = text("UPDATE clientes SET endereco = :novo_endereco WHERE cpf = :cpf")
+
     with engine.connect() as connection:
-        connection.execute(query, {
-                'id_cliente': id_cliente, 
-                'novo_endereco': novo_endereco
-            })
+        connection.execute(query, {'cpf': cpf, 'novo_endereco': novo_endereco})
         connection.commit()
 
-    return jsonify({"message": "Endereço do cliente com ID {id_cliente} alterado com sucesso!"})
+    return jsonify({"message": f"Endereço do cliente com CPF {cpf} alterado com sucesso!"})
 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
