@@ -111,23 +111,16 @@ def adicionar_veiculo():
 @app.route("/get_all_clientes", methods=["GET"])
 def get_all_clientes():
     query = """
-    MATCH (r:Reserva)
-    RETURN r.dt_reserva AS StartDate, r.dt_devolucao AS EndDate, r.valor AS Value
-    ORDER BY r.dt_reserva
+    MATCH (r:Cliente) 
+    return r.nome as nome, r.cnh as cnh, r.cpf as cpf, r.endereco as endereco
     """
-    result = graph.run(query)
+    result = graph.run(query).data()
     
-    # Formatting result into a list of dictionaries for easier JSON serialization
-    reservas = [{"StartDate": record["StartDate"],
-                 "EndDate": record["EndDate"],
-                 "Value": record["Value"]} for record in result]
-
     # Check if reservas list is not empty before returning
-    if reservas:
-        return jsonify(reservas)
+    if result:
+        return jsonify(result)
     else:
-        return jsonify({"message": "No reservations found"}), 404
-
+        return jsonify({"message": "No reservations found"})
 
 @app.route("/alterar_endereco_cliente/<string:cpf>", methods=["PUT"])
 def alterar_endereco_cliente(cpf):
@@ -139,8 +132,11 @@ def alterar_endereco_cliente(cpf):
     SET c.endereco = $novo_endereco
     RETURN c
     """
-    graph.run(query, cpf=cpf, novo_endereco=novo_endereco)
-    return jsonify({"message": f"Endereço do cliente com CPF {cpf} alterado com sucesso!"})
+    result = graph.run(query, cpf=cpf, novo_endereco=novo_endereco).data();
+    if result:
+        return jsonify({"message": f"Endereço do cliente com CPF {cpf} alterado com sucesso!"}), 200 
+    else:
+        return jsonify({"message": f"Erro na alteração do endereço"}), 404
 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
@@ -203,9 +199,9 @@ def fazer_reserva():
 @app.route("/get_all_reservas", methods=["GET"])
 def get_all_reservas():
     query = """
-    MATCH (r:Reserva)
-    RETURN r.dt_reserva AS StartDate, r.dt_devolucao AS EndDate, r.valor AS Value
-    ORDER BY r.dt_reserva
+    MATCH (c:Cliente)-->(r:Reserva), (f:Funcionario)-->(r), (r)-->(v:Veiculo)
+     RETURN DISTINCT c.nome AS cliente, f.nome AS funcionario, r.valor AS valor, 
+               r.dt_reserva AS dt_reserva, r.dt_devolucao AS dt_devolucao, v.placa AS veiculo
     """
     result = graph.run(query)
     reservas = []

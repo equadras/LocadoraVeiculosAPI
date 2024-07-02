@@ -64,25 +64,19 @@ def get_all_veiculos():
 def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes")
 
-    print(response)
     if response.status_code == 200:
         clientes = response.json()
         for cliente in clientes:
             print("Nome:", cliente["nome"])
             print("CPF:", cliente["cpf"])
             print("Endereço:", cliente["endereco"])
-            print("Data de nascimento:", cliente["dt_nasc"])
             print("CNH:", cliente["cnh"])
             print("#####################################")
     else:
         print("Erro ao listar clientes:", response.status_code, response.text)
 
-
-
-
 def get_all_funcionarios():
     response = requests.get(local_host + "/get_all_funcionarios")
-
     if response.status_code == 200:
         funcionarios = response.json()
         for funcionario in funcionarios:
@@ -97,35 +91,30 @@ def get_all_funcionarios():
     else:
         print ("Erro ao listar funcionarios")
 
-
-def get_all_clientes():
-    response = requests.get(local_host + "/get_all_clientes");
-
-    if response.status_code == 200:
-        clientes = response.json()
-        for cliente in clientes:
-            print("Nome:", cliente["nome"])
-            print("CPF:", cliente["cpf"])
-            print("#####################################") 
-    else:
-        return "Erro ao listar clientes"
-
 def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes")
-    print(response)
     if response.status_code == 200:
         clientes = response.json()
         for cliente in clientes:
             print("Nome:", cliente.get("nome", "Unavailable"))
             print("CPF:", cliente.get("cpf", "Unavailable"))
             print("Endereço:", cliente.get("endereco", "Unavailable"))
-            print("Data de nascimento:", cliente.get("dt_nasc", "Unavailable"))
             print("CNH:", cliente.get("cnh", "Unavailable"))
             print("#####################################")
     else:
         print("Erro ao listar clientes:", response.status_code, response.text)
 
+def alterar_endereco_cliente():
+    cpf = str(input("CPF cliente: "))
+    novo_endereco = input("Novo endereço: ")
 
+    cliente_data = {"endereco": novo_endereco }
+    
+    response = requests.put(local_host + f"/alterar_endereco_cliente/{cpf}", json=cliente_data)
+    if response.status_code == 200:
+        return "Endereco do cliente alterado com sucesso!";
+    else:
+        return "Erro ao alterar o enredeço do cliente"
 
 def cadastrar_cliente():
     nome = input("Nome: ")
@@ -224,9 +213,6 @@ def get_all_reservas():
     if response.status_code == 200:
         reservas = response.json()
         for reserva in reservas:
-            print("Código da reserva:", reserva.get("cod_reserva", "N/A"))  # Safe access with default value
-            print("Código do cliente:", reserva.get("cod_cliente", "N/A"))
-            print("ID do funcionário:", reserva.get("id_funcionario", "N/A"))
             print("Valor:", reserva.get("valor", "N/A"))  # Prevent KeyError by using .get()
             print("Data da reserva:", reserva.get("dt_reserva", "N/A"))
             print("Data de devolução:", reserva.get("dt_devolucao", "N/A"))
