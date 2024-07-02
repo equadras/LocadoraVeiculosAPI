@@ -42,25 +42,43 @@ def adicionar_veiculo():
     else:
         return "Erro ao cadastrar o veículo."
 
-
 def get_all_veiculos():
-    response = requests.get(local_host + "/get_all_veiculos");
+    response = requests.get(local_host + "/get_all_veiculos")
 
     if response.status_code == 200:
-        veiculos = response.json()
+        veiculos = response.json()  # Assumindo que a resposta é uma lista de veículos
         for veiculo in veiculos:
-            if (veiculo["ativo"] == False):
-                continue
-            else:
-                print("Marca:", veiculo["marca"])
-                print("Modelo:", veiculo["modelo"])
-                print("Valor:", veiculo["vlr_car"])
-                print("Tipo de combustivel:", veiculo["tipo_comb"])
-                print("Ar condicionado:", veiculo["ar_cond"])
-                print("Placa:", veiculo["placa"])
-                print("#####################################") 
+            print("Placa:", veiculo["placa"])
+            print("Marca:", veiculo["marca"])
+            print("Modelo:", veiculo["modelo"])
+            print("Cor:", veiculo["cor"])
+            print("Tipo de Combustível:", veiculo["tipo_comb"])
+            print("Quilometragem:", veiculo["kms"])
+            print("Valor do Carro:", veiculo["vlr_car"])
+            print("Ar Condicionado:", 'Sim' if veiculo["ar_cond"] else 'Não')
+            print("Ativo:", 'Sim' if veiculo["ativo"] else 'Não')
+            print("#####################################")
     else:
-        return "Erro ao listar clientes"
+        print("Erro ao listar veículos:", response.status_code, response.text)
+
+def get_all_clientes():
+    response = requests.get(local_host + "/get_all_clientes")
+
+    print(response)
+    if response.status_code == 200:
+        clientes = response.json()
+        for cliente in clientes:
+            print("Nome:", cliente["nome"])
+            print("CPF:", cliente["cpf"])
+            print("Endereço:", cliente["endereco"])
+            print("Data de nascimento:", cliente["dt_nasc"])
+            print("CNH:", cliente["cnh"])
+            print("#####################################")
+    else:
+        print("Erro ao listar clientes:", response.status_code, response.text)
+
+
+
 
 def get_all_funcionarios():
     response = requests.get(local_host + "/get_all_funcionarios")
@@ -92,17 +110,21 @@ def get_all_clientes():
     else:
         return "Erro ao listar clientes"
 
-def alterar_endereco_cliente():
-    cpf = str(input("CPF cliente: "))
-    novo_endereco = input("Novo endereço: ")
-
-    cliente_data = {"endereco": novo_endereco }
-    
-    response = requests.put(local_host + f"/alterar_endereco_cliente/{cpf}", json=cliente_data)
+def get_all_clientes():
+    response = requests.get(local_host + "/get_all_clientes")
+    print(response)
     if response.status_code == 200:
-        return "Endereco do cliente alterado com sucesso!";
+        clientes = response.json()
+        for cliente in clientes:
+            print("Nome:", cliente.get("nome", "Unavailable"))
+            print("CPF:", cliente.get("cpf", "Unavailable"))
+            print("Endereço:", cliente.get("endereco", "Unavailable"))
+            print("Data de nascimento:", cliente.get("dt_nasc", "Unavailable"))
+            print("CNH:", cliente.get("cnh", "Unavailable"))
+            print("#####################################")
     else:
-        return "Erro ao alterar o enredeço do cliente"
+        print("Erro ao listar clientes:", response.status_code, response.text)
+
 
 
 def cadastrar_cliente():
@@ -198,19 +220,20 @@ def demitir_funcionario():
 
 def get_all_reservas():
     response = requests.get(local_host + "/get_all_reservas")
-
+    
     if response.status_code == 200:
         reservas = response.json()
         for reserva in reservas:
-            print("Código da reserva:", reserva["cod_reserva"])
-            print("Código do cliente:", reserva["cod_cliente"])
-            print("ID do funcionário:", reserva["id_funcionario"])
-            print("Valor:", reserva["valor"])
-            print("Data da reserva:", reserva["dt_reserva"])
-            print("Data de devolução:", reserva["dt_devolucao"])
+            print("Código da reserva:", reserva.get("cod_reserva", "N/A"))  # Safe access with default value
+            print("Código do cliente:", reserva.get("cod_cliente", "N/A"))
+            print("ID do funcionário:", reserva.get("id_funcionario", "N/A"))
+            print("Valor:", reserva.get("valor", "N/A"))  # Prevent KeyError by using .get()
+            print("Data da reserva:", reserva.get("dt_reserva", "N/A"))
+            print("Data de devolução:", reserva.get("dt_devolucao", "N/A"))
+            print("Placa do veículo:", reserva.get("placa_veiculo", "N/A"))
             print("#####################################")
     else:
-        return "Erro ao listar reservas"
+        print("Erro ao listar reservas:", response.status_code)
 
 
 def fazer_reserva():
