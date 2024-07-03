@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from py2neo import Graph, Node, Relationship
 from datetime import datetime, timedelta, date
-import neo4j
+from py2neo.data import Node, Relationship
 
 app = Flask(__name__)
 
@@ -122,6 +122,7 @@ def get_all_clientes():
     else:
         return jsonify({"message": "No reservations found"})
 
+
 @app.route("/alterar_endereco_cliente/<string:cpf>", methods=["PUT"])
 def alterar_endereco_cliente(cpf):
     data = request.json
@@ -158,34 +159,27 @@ def cadastrar_cliente():
 def fazer_reserva():
     data = request.json
     cpf = data.get("cpf")
+    cpf_funcionario = data.get("cpf_funcionario")
+    dias = int(data.get("dias"))
+    dt_reserva = data.get("dt_reserva")
+    dt_devolucao = data.get("dt_devolucao")
+    placa = data.get("placa")
 
     cliente = graph.evaluate("MATCH (c:Cliente {cpf: $cpf}) RETURN c", cpf=cpf)
     if not cliente:
-        return "Cliente não encontrado", 404
+        return jsonify({"error": "Cliente não encontrado"}), 404
 
-    cpf_funcionario = data.get("cpf_funcionario")
     funcionario = graph.evaluate("MATCH (f:Funcionario {cpf: $cpf}) RETURN f", cpf=cpf_funcionario)
     if not funcionario:
-        return "Funcionário não encontrado", 404
+        return jsonify({"error": "Funcionário não encontrado"}), 404
 
-    dias = int(data.get("dias"))
-    dt_reserva = data.get("dt_reserva")
-    dt_reserva_obj = datetime.fromisoformat(dt_reserva)
-    dt_devolucao_obj = dt_reserva_obj + timedelta(days=dias)
-    dt_devolucao = dt_devolucao_obj.isoformat()
-
-    placa = data.get("placa")
     veiculo = graph.evaluate("MATCH (v:Veiculo {placa: $placa}) RETURN v", placa=placa)
     if not veiculo:
-        return "Carro não encontrado", 404
+        return jsonify({"error": "Carro não encontrado"}), 404
 
-    if veiculo.get('vlr_car') is None:
-        return jsonify({"error": "Valor do carro não disponível"}), 400
-
-    valor = calcular_valor_reserva(veiculo['vlr_car'], dias)
+    valor = calcular_valor_reserva(veiculo['vlr_car'], dias)  # Supõe-se que você tenha essa função definida em algum lugar.
     if valor is None:
         return jsonify({"error": "Erro ao calcular o valor da reserva"}), 400
-
 
     reserva = Node("Reserva", valor=valor, dt_reserva=dt_reserva, dt_devolucao=dt_devolucao)
     graph.create(reserva)
@@ -194,65 +188,31 @@ def fazer_reserva():
     graph.create(Relationship(funcionario, "PROCESSOU", reserva))
     graph.create(Relationship(reserva, "INCLUI", veiculo))
 
-    return jsonify({"message": "Reserva realizada com sucesso!", "valor": valor})
+    return jsonify({"message": "Reserva realizada com sucesso!", "valor": valor}), 200
 
 @app.route("/get_all_reservas", methods=["GET"])
 def get_all_reservas():
     query = """
     MATCH (c:Cliente)-->(r:Reserva), (f:Funcionario)-->(r), (r)-->(v:Veiculo)
-     RETURN DISTINCT c.nome AS cliente, f.nome AS funcionario, r.valor AS valor, 
-               r.dt_reserva AS dt_reserva, r.dt_devolucao AS dt_devolucao, v.placa AS veiculo
+    RETURN DISTINCT c.nome AS cliente, f.nome AS funcionario, r.valor AS valor,
+               r.dt_reserva AS dt_reserva, r.dt_devolucao AS dt_devolucao, v.placa AS placa_veiculo
     """
     result = graph.run(query)
-    reservas = []
-
+    response = []
     for record in result:
-        start_date = record['StartDate']
-        end_date = record['EndDate']
-
-        # Check if start_date is already a string
-        if isinstance(start_date, str):
-            try:
-                # Attempt to parse the string to a date object if necessary
-                parsed_date = datetime.strptime(start_date, '%Y-%m-%d')
-                start_date = parsed_date.strftime('%Y-%m-%d')
-            except ValueError:
-                # If it's not a valid date string, use it as is
-                pass
-        else:
-            # If start_date is some other type (not string and not None), handle accordingly
-            start_date = None  # or some default error handling
-
-        # Similar handling for end_date
-        if isinstance(end_date, str):
-            try:
-                parsed_date = datetime.strptime(end_date, '%Y-%m-%d')
-                end_date = parsed_date.strftime('%Y-%m-%d')
-            except ValueError:
-                pass
-        else:
-            end_date = None
-
-        reserva = {
-            "StartDate": start_date,
-            "EndDate": end_date,
-            "Value": record["Value"]
-        }
-        reservas.append(reserva)
-
-    if reservas:
-        return jsonify(reservas)
-    else:
-        return jsonify({"message": "No reservations found"}), 404
-
-
+        data = record.data()
+        for key in data:
+            if data[key] is not None:
+                data[key] = str(data[key])
+        response.append(data)
+    return jsonify(response)
 
 def calcular_valor_reserva(vlr_carro, dias):
     try:
         valor_por_dia = (0.001 * float(vlr_carro)) + 10
         return valor_por_dia * int(dias)
     except ValueError:
-        return None  # Or handle the error as needed
+        return None  
 
 @app.route("/")
 def hello_world():

@@ -1,5 +1,6 @@
 import json
 import requests
+from datetime import datetime
 
 local_host = "http://127.0.0.1:8080"
 
@@ -88,6 +89,8 @@ def get_all_funcionarios():
                 print("Nome: ", funcionario["nome"])
                 print("CPF: ", funcionario["cpf"])
                 print("Cargo: ", funcionario["cargo"])
+                print("Endereço: ", funcionario["endereco"])
+
     else:
         print ("Erro ao listar funcionarios")
 
@@ -213,42 +216,61 @@ def get_all_reservas():
     if response.status_code == 200:
         reservas = response.json()
         for reserva in reservas:
-            print("Valor:", reserva.get("valor", "N/A"))  # Prevent KeyError by using .get()
-            print("Data da reserva:", reserva.get("dt_reserva", "N/A"))
-            print("Data de devolução:", reserva.get("dt_devolucao", "N/A"))
+            print("Valor:", reserva.get("valor", "N/A"))
+            print("Data da reserva:", format_date(reserva.get("dt_reserva", "N/A")))
+            print("Data de devolução:", format_date(reserva.get("dt_devolucao", "N/A")))
             print("Placa do veículo:", reserva.get("placa_veiculo", "N/A"))
             print("#####################################")
     else:
         print("Erro ao listar reservas:", response.status_code)
 
+def format_date(date_str):
+    """Format the ISO date string to a more readable format, omitting time if it is midnight."""
+    if date_str == "N/A":
+        return date_str
+    try:
+        date_obj = datetime.fromisoformat(date_str)
+        if date_obj.time() == datetime.min.time():
+            return date_obj.strftime('%Y-%m-%d')  # If time is 00:00, output just the date
+        else:
+            return date_obj.strftime('%Y-%m-%d %H:%M:%S')  # Otherwise, output date and time
+    except ValueError:
+        return "Invalid date format"
 
 def fazer_reserva():
     get_all_veiculos()
-    placa = input("Placa do carro:")
+    placa = input("Placa do carro: ")
 
     get_all_clientes()
-    cpf = input("CPF do cliente:")
+    cpf = input("CPF do cliente: ")
 
     get_all_funcionarios()
-    id_funcionario = input("CPF do funcionario:")
+    id_funcionario = input("CPF do funcionario: ")
 
     dt_reserva = input("Data inicio da reserva (no formato YYYY-MM-DD): ")
-    dias = input("Quantidade de dias:")
+    dt_final = input("Data final da reserva (no formato YYYY-MM-DD): ")
+
+    # Conversão das strings para objetos datetime
+    data_inicio = datetime.strptime(dt_reserva, '%Y-%m-%d')
+    data_final = datetime.strptime(dt_final, '%Y-%m-%d')
+    
+    # Cálculo da diferença em dias
+    dias = (data_final - data_inicio).days
 
     cliente_data = { 
-            "cpf": cpf,
-            "cpf_funcionario": id_funcionario,
-            "dias": dias,
-            "dt_reserva": dt_reserva,
-            "placa": placa
-            }
-
+        "cpf": cpf,
+        "cpf_funcionario": id_funcionario,
+        "dias": dias,
+        "dt_reserva": dt_reserva,
+        "placa": placa,
+        "dt_devolucao": dt_final
+    }
     response = requests.post(local_host + "/fazer_reserva", json=cliente_data)
 
     if response.status_code == 200:
-        valor = response.json()  # Extracting the value from the JSON response
+        valor = response.json()['valor']  # Extracting the value from the JSON response
         print("Valor da reserva:", valor)
         return "Reserva realizada com sucesso!"
     else:
-        return "Erro ao realizar a reserva."
-
+        print("Erro ao realizar a reserva:", response.status_code)
+        return response.text
