@@ -5,13 +5,14 @@ from datetime import datetime
 local_host = "http://127.0.0.1:8080"
 
 def tirar_veiculo_frota():
+    get_all_veiculos_ativo()
     placa = input("Qual a placa do veiculo: ")
     response = requests.delete(local_host + f"/tirar_veiculo_frota/{placa}")
 
     if response.status_code == 200:
         return "Veiculo retirado com sucesso!"
     else:
-        return "Erro ao retirar o veiculo"
+        return "Erro ao retirar o veiculo: Veículo não existe ou já se encontra ativo"
 
 def adicionar_veiculo():
     placa = input("Placa do veículo: ")
@@ -47,7 +48,7 @@ def get_all_veiculos():
     response = requests.get(local_host + "/get_all_veiculos")
 
     if response.status_code == 200:
-        veiculos = response.json()  # Assumindo que a resposta é uma lista de veículos
+        veiculos = response.json()
         for veiculo in veiculos:
             print("Placa:", veiculo["placa"])
             print("Marca:", veiculo["marca"])
@@ -60,7 +61,29 @@ def get_all_veiculos():
             print("Ativo:", 'Sim' if veiculo["ativo"] else 'Não')
             print("#####################################")
     else:
-        print("Erro ao listar veículos:", response.status_code, response.text)
+        print("Erro ao listar veículos: " + response.status_code + response.text)
+    print("=-=" * 10)
+
+def get_all_veiculos_ativo():
+    response = requests.get(local_host + "/get_all_veiculos")
+
+    if response.status_code == 200:
+        veiculos = response.json()
+        for veiculo in veiculos:
+            if not veiculo["ativo"]:
+                continue
+            print("Placa:", veiculo["placa"])
+            print("Marca:", veiculo["marca"])
+            print("Modelo:", veiculo["modelo"])
+            print("Cor:", veiculo["cor"])
+            print("Tipo de Combustível:", veiculo["tipo_comb"])
+            print("Quilometragem:", veiculo["kms"])
+            print("Valor do Carro:", veiculo["vlr_car"])
+            print("Ar Condicionado:", 'Sim' if veiculo["ar_cond"] else 'Não')
+            print("#####################################")
+    else:
+        print("Erro ao listar veículos: " + response.status_code + response.text)
+    print("=-=" * 10)
 
 def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes")
@@ -75,6 +98,7 @@ def get_all_clientes():
             print("#####################################")
     else:
         print("Erro ao listar clientes:", response.status_code, response.text)
+    print("=-=" * 10)
 
 def get_all_funcionarios():
     response = requests.get(local_host + "/get_all_funcionarios")
@@ -92,7 +116,8 @@ def get_all_funcionarios():
                 print("Endereço: ", funcionario["endereco"])
 
     else:
-        print ("Erro ao listar funcionarios")
+        print("Erro ao listar funcionarios")
+    print("=-=" * 10)
 
 def get_all_clientes():
     response = requests.get(local_host + "/get_all_clientes")
@@ -188,6 +213,7 @@ def promover_funcionario():
         return "Erro ao promover o funcionario."
 
 def alterar_endereco_funcionario():
+    get_all_funcionarios()
     cpf = input("CPF do funcionario: ")
     novo_endereco = input("Novo endereco: ")
 
@@ -199,8 +225,10 @@ def alterar_endereco_funcionario():
         return "endereco do funcionario alterado com sucesso!"
     else:
         return "Erro ao alterar o endereco do funcionario."
+    print("=-=" * 10)
 
 def demitir_funcionario():
+    get_all_funcionarios()
     cpf = input("CPF do funcionario: ")
 
     response = requests.delete(local_host + "/demitir_funcionario/" + cpf);
@@ -209,6 +237,7 @@ def demitir_funcionario():
         return "Funcionario demitido com sucesso"
     else:
         return "Erro ao demitir funcionario."
+    print("=-=" * 10)
 
 def get_all_reservas():
     response = requests.get(local_host + "/get_all_reservas")
@@ -223,22 +252,22 @@ def get_all_reservas():
             print("#####################################")
     else:
         print("Erro ao listar reservas:", response.status_code)
+    print("=-=" * 10)
 
 def format_date(date_str):
-    """Format the ISO date string to a more readable format, omitting time if it is midnight."""
     if date_str == "N/A":
         return date_str
     try:
         date_obj = datetime.fromisoformat(date_str)
         if date_obj.time() == datetime.min.time():
-            return date_obj.strftime('%Y-%m-%d')  # If time is 00:00, output just the date
+            return date_obj.strftime('%Y-%m-%d')
         else:
-            return date_obj.strftime('%Y-%m-%d %H:%M:%S')  # Otherwise, output date and time
+            return date_obj.strftime('%Y-%m-%d %H:%M:%S')
     except ValueError:
         return "Invalid date format"
 
 def fazer_reserva():
-    get_all_veiculos()
+    get_all_veiculos_ativo()
     placa = input("Placa do carro: ")
 
     get_all_clientes()
@@ -250,11 +279,9 @@ def fazer_reserva():
     dt_reserva = input("Data inicio da reserva (no formato YYYY-MM-DD): ")
     dt_final = input("Data final da reserva (no formato YYYY-MM-DD): ")
 
-    # Conversão das strings para objetos datetime
     data_inicio = datetime.strptime(dt_reserva, '%Y-%m-%d')
     data_final = datetime.strptime(dt_final, '%Y-%m-%d')
     
-    # Cálculo da diferença em dias
     dias = (data_final - data_inicio).days
 
     cliente_data = { 
@@ -265,10 +292,11 @@ def fazer_reserva():
         "placa": placa,
         "dt_devolucao": dt_final
     }
+
     response = requests.post(local_host + "/fazer_reserva", json=cliente_data)
 
     if response.status_code == 200:
-        valor = response.json()['valor']  # Extracting the value from the JSON response
+        valor = response.json()['valor']
         print("Valor da reserva:", valor)
         return "Reserva realizada com sucesso!"
     else:

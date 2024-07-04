@@ -46,21 +46,24 @@ while (sair):
         case 4:
             print(cadastrar_funcionario())
         case 5:
-            print(get_all_funcionarios())
+            get_all_funcionarios()
         case 6:
             print(alterar_endereco_funcionario())
         case 7:
             print(demitir_funcionario())
         case 8:
+            get_all_funcionarios()
             print(promover_funcionario())
         case 9:
             print(adicionar_veiculo())
         case 10:
-            print(get_all_veiculos())
+            get_all_veiculos()
         case 11:
+            get_all_veiculos_ativo()
             print(tirar_veiculo_frota())
         case 12:
+            get_all_veiculos_ativo()
             print(fazer_reserva())
         case 13:
-            print(get_all_reservas())
+            get_all_reservas()
 

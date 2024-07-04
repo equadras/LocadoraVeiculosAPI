@@ -50,8 +50,12 @@ def promover_funcionario(cpf):
     SET f.cargo = $novo_cargo, f.salario = $novo_salario
     RETURN f
     """
-    graph.run(query, cpf=cpf, novo_cargo=novo_cargo, novo_salario=novo_salario)
-    return f"Dados do funcionário com CPF {cpf} atualizados com sucesso!"
+    result = graph.run(query, cpf=cpf, novo_cargo=novo_cargo, novo_salario=novo_salario).data()
+
+    if len(result) > 0:
+        return f"Dados do funcionário com CPF {cpf} atualizados com sucesso!", 200
+    else:
+        return f"Funcionario com CPF {cpf} nao existe!", 404
 
 @app.route("/alterar_endereco_funcionario/<string:cpf>", methods=["PUT"])
 def alterar_endereco_funcionario(cpf):
@@ -60,21 +64,32 @@ def alterar_endereco_funcionario(cpf):
     
     query = """
     MATCH (f:Funcionario {cpf: $cpf})
+    WHERE f.ativo = true
     SET f.endereco = $novo_endereco
     RETURN f
     """
-    graph.run(query, cpf=cpf, novo_endereco=novo_endereco)
-    return f"Endereço do funcionário com CPF {cpf} alterado com sucesso!"
+    result = graph.run(query, cpf=cpf, novo_endereco=novo_endereco).data()
+    if result: 
+        return f"Endereço do funcionário com CPF {cpf} alterado com sucesso!", 200
+    else:
+        return jsonify({"message": f"Erro na alteração do endereço"}), 500
+
 
 @app.route("/demitir_funcionario/<string:cpf>", methods=["DELETE"])
 def demitir_funcionario(cpf):
+    get_all_funcionarios()
+
     query = """
     MATCH (f:Funcionario {cpf: $cpf})
     SET f.ativo = false
     RETURN f
     """
-    graph.run(query, cpf=cpf)
-    return f"Funcionário com CPF {cpf} foi demitido com sucesso!"
+    result = graph.run(query, cpf=cpf).data();
+
+    if len(result) > 0:
+        return f"Funcionário com CPF {cpf} foi demitido com sucesso!", 200
+    else:
+        return f"Funcionario não existe", 404
 
 # =================== ROTAS VEICULOS =================== 
 @app.route("/get_all_veiculos", methods=["GET"])
@@ -92,11 +107,16 @@ def get_all_veiculos():
 def tirar_veiculo_frota(placa):
     query = """
     MATCH (v:Veiculo {placa: $placa})
+    WHERE v.ativo = true
     SET v.ativo = false
     RETURN v
     """
-    graph.run(query, placa=placa)
-    return f"Veículo com placa {placa} foi retirado da frota com sucesso!"
+    result = graph.run(query, placa=placa).data()
+
+    if len(result) > 0:
+        return f"Veículo com placa {placa} foi retirado da frota com sucesso!", 200
+    else:
+        return f"Veículo com placa {placa} nao existe ou já foi retirado da frota!", 404
 
 @app.route("/adicionar_veiculo", methods=["POST"])
 def adicionar_veiculo():
@@ -116,11 +136,10 @@ def get_all_clientes():
     """
     result = graph.run(query).data()
     
-    # Check if reservas list is not empty before returning
     if result:
-        return jsonify(result)
+        return jsonify(result), 200
     else:
-        return jsonify({"message": "No reservations found"})
+        return jsonify({"message": "Nenhum cliente cadastrado"}), 404
 
 
 @app.route("/alterar_endereco_cliente/<string:cpf>", methods=["PUT"])
@@ -134,10 +153,12 @@ def alterar_endereco_cliente(cpf):
     RETURN c
     """
     result = graph.run(query, cpf=cpf, novo_endereco=novo_endereco).data();
+
     if result:
         return jsonify({"message": f"Endereço do cliente com CPF {cpf} alterado com sucesso!"}), 200 
     else:
         return jsonify({"message": f"Erro na alteração do endereço"}), 404
+
 
 @app.route("/cadastrar_cliente", methods=["POST"])
 def cadastrar_cliente():
@@ -177,7 +198,7 @@ def fazer_reserva():
     if not veiculo:
         return jsonify({"error": "Carro não encontrado"}), 404
 
-    valor = calcular_valor_reserva(veiculo['vlr_car'], dias)  # Supõe-se que você tenha essa função definida em algum lugar.
+    valor = calcular_valor_reserva(veiculo['vlr_car'], dias)
     if valor is None:
         return jsonify({"error": "Erro ao calcular o valor da reserva"}), 400
 
