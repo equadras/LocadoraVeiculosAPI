@@ -1,4 +1,4 @@
-# API oLcadora de Veículos
+# API Locadora de Veículos
 
 # Set up
 Primeiro, instale o packet manager do python com o comando
